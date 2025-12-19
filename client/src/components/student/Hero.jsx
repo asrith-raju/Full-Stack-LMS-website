@@ -8,6 +8,8 @@ const Hero = () => {
 
       <p className='md:block hidden text-gray-500 max-w-2xl mx-auto'>we bring together world-class instructors,interactive content ,and a supportive community to help you achieve your personal and proffessional goals </p>
       <p className='md:hidden text-gray-500 max-w-sm mx-auto'>we bring together world-class instructors o help you achieve your proffessional goals</p>
+
+      
     </div>
   )
 }
