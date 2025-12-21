@@ -4,6 +4,7 @@ import SearchBar from '../../components/student/SearchBar'
 import { data, useParams } from 'react-router-dom'
 import CourseCard from '../../components/student/CourseCard'
 import { assets } from '../../assets/assets'
+import Footer from '../../components/student/Footer'
 
 const CoursesList = () => {
   const { navigate,allCourses} = useContext(AppContext)
@@ -51,6 +52,7 @@ const CoursesList = () => {
            {filteresCourse.map((course,index)=><CourseCard key={index} course={course}/>)}
         </div>
       </div>
+      <Footer/>
     </>
   )
 }
