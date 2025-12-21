@@ -2,9 +2,10 @@ import React, { useContext } from 'react'
 import { AppContext } from '../../context/AppContext'
 import SearchBar from '../../components/student/SearchBar'
 import { data, useParams } from 'react-router-dom'
+import CourseCard from '../../components/student/CourseCard'
 
 const CoursesList = () => {
-  const { navigate } = useContext(AppContext)
+  const { navigate,allCourses} = useContext(AppContext)
 
   const {input}= useParams()
   return (
@@ -19,8 +20,8 @@ const CoursesList = () => {
         <SearchBar data={input}/>
         </div>
 
-        <div>
-           
+        <div className='grid grid-col-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 my-16 gap-3 px-2 md:p-0'>
+           {allCourses.map((course,index)=><CourseCard key={index} course={course}/>)}
         </div>
       </div>
     </>
