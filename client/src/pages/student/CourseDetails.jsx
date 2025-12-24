@@ -17,6 +17,8 @@ const CourseDetails = () => {
 
   const [isAlreadyEnrolled, setIsAlreadyEnrolled] = useState(false)
 
+  const [playerData, setPlayerData] = useState(null)
+
   const { allCourses, calculateRating, calculateChapterTime, calculateNoOfLectures, CalculateCourseDuration, currency } = useContext(AppContext)
 
 
@@ -84,7 +86,11 @@ const CourseDetails = () => {
                           <div className='flex items-center justify-between w-full text-gray-800 text-xs md:text-default'>
                             <p>{lecture.lectureTitle}</p>
                             <div className='flex gap-2'>
-                              {lecture.isPreviewFree && <p className='text-blue-500 cursor-pointer'>Preview</p>}
+                              {lecture.isPreviewFree && <p
+                               onClick={()=>setPlayerData({
+                                videoId : lecture.lectureUrl.split('/').pop()
+                               })} 
+                               className='text-blue-500 cursor-pointer'>Preview</p>}
                               <p>{humanizeDuration(lecture.lectureDuration * 60 * 1000, { units: ['h', 'm'] })}</p>
                             </div>
                           </div>
