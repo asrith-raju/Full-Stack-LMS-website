@@ -6,6 +6,7 @@ import Loading from '../../components/student/Loading'
 import { assets } from '../../assets/assets'
 import humanizeDuration from 'humanize-duration'
 import Footer from '../../components/student/Footer'
+import YouTube from 'react-youtube'
 
 const CourseDetails = () => {
 
@@ -113,11 +114,18 @@ const CourseDetails = () => {
         </div>
         {/* Right column */}
         <div className='max-w-course-card z-10 shadow-custom-card rounded-t md:rounded-none overflow-hidden bg-white min-w-[300px] sm:min-w-[420px]'>
-
+ 
+            {
+              playerData? 
+                  <YouTube videoId={playerData.videoId} opts={{playerVars:{autoplay:1}}} iframeClassName='w-full aspect-video'/>
+                :
           <img src={courseData.courseThumbnail} alt="" />
+            }
           <div className='p-5'>
             <div className='flex items-center gap-2'>
+              
               <img src={assets.time_clock_icon} alt="clock_icon" className='w-3.5' />
+            
               <p className='text-red-500'><span className='font-medium'>5 days</span> left at this price</p>
             </div>
             <div className='flex gap-3 items-center pt-2'>
