@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import { AppContext } from '../../context/AppContext'
 
 const MyEnrollments = () => {
+
   return (
     <>
     <div className='md:px-36 px-8 pt-10'>
