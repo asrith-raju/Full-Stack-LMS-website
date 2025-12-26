@@ -1,9 +1,31 @@
 import React, { useContext } from 'react'
 import { AppContext } from '../../context/AppContext'
+import { useState } from 'react'
 
 const MyEnrollments = () => {
 
   const {enrolledCourses ,CalculateCourseDuration} = useContext(AppContext)
+
+  const [progressArray, setProgressArray] = useState([
+    {lectureCompleted:2,totalLectures:4},
+    {lectureCompleted:3,totalLectures:0},
+    {lectureCompleted:0,totalLectures:5},
+    {lectureCompleted:5,totalLectures:5},
+    {lectureCompleted:1,totalLectures:9},
+    {lectureCompleted:3,totalLectures:5},
+    {lectureCompleted:2,totalLectures:5},
+    {lectureCompleted:2,totalLectures:4},
+    {lectureCompleted:1,totalLectures:9},
+    {lectureCompleted:2,totalLectures:7},
+    {lectureCompleted:5,totalLectures:7},
+    {lectureCompleted:2,totalLectures:4},
+    {lectureCompleted:2,totalLectures:4},
+    {lectureCompleted:2,totalLectures:4},
+    {lectureCompleted:5,totalLectures:10},
+    {lectureCompleted:2,totalLectures:4},
+    {lectureCompleted:0,totalLectures:4},
+    {lectureCompleted:1,totalLectures:4}
+  ])
   return (
     <>
     <div className='md:px-36 px-8 pt-10'>
@@ -31,10 +53,12 @@ const MyEnrollments = () => {
                    {CalculateCourseDuration(course)}
                </td>
                <td className='px-4 py-3 max-sm:hidden'>
-                4/10 <span>Lectures</span>
+                {progressArray[index] && `${progressArray[index].lectureCompleted}/ ${progressArray[index].totalLectures}`}<span>Lectures</span>
                </td>
                <td className='px-4 py-3 max-sm:text-right'>
-                <button className='px-3 sm:px-5 py-1.5 sm:py-2 bg-blue-600 max-sm:text-xs text-white'>On Going</button>
+                <button className='px-3 sm:px-5 py-1.5 sm:py-2 bg-blue-600 max-sm:text-xs text-white'>
+                  {progressArray[index] && progressArray[index].lectureCompleted / progressArray[index].totalLectures === 1 ? 'Completed':'On Going' }
+                  </button>
                </td>
             </tr>
           ))}
