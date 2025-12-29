@@ -14,12 +14,16 @@ const SideBar = () => {
 ];
   return  isEducator &&(
     <div className='md:w-64 w-16 border-r min-h-screen text-base border-gray-500 py-2 flex flex-col'>
-    {menuItems.map((item)=>{
-      <NavLink>
+    {menuItems.map((item)=>(
+      <NavLink
+      to={item.path}
+      key={item.name}
+      end={item.path ==='/educator'}
+      >
         <img src={item.icon} alt=""  className='w-6 h-6 '/>
         <p className='md:block hidden text-center'>{item.name}</p>
       </NavLink>
-    })}
+    ))}
     </div>
   )
 }
