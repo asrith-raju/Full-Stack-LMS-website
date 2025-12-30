@@ -14,7 +14,7 @@ const Footer = () => {
         <img src={assets.facebook_icon} alt="" />
       </a>
       <a href="#">
-        <img src={assets.twitter_ico} alt="" />
+        <img src={assets.twitter_icon} alt="" />
       </a>
       <a href="#">
         <img src={assets.instagram_icon} alt="" />
