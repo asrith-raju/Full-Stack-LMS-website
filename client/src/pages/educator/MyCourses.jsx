@@ -1,9 +1,24 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
+import { AppContext } from '../../context/AppContext'
 
 const MyCourses = () => {
+  const {currency,allCourses} = useContext(AppContext)
+
+  const [courses, setCourses] = useState(null)
+
+  const fetchEducatorCourses = ()=>{
+    setCourses(allCourses)
+  }
+
+  useEffect(() => {
+    
+  fetchEducatorCourses()
+    
+  }, [])
+  
   return (
     <div>
-      <h1>My courses page</h1>
+     
     </div>
   )
 }
