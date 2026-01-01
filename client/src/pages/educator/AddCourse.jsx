@@ -24,6 +24,26 @@ const AddCourse = () => {
     }
   )
 
+  const handleChapter = (action,chapterId) =>{
+    if(action ==='add'){
+      const title = prompt('Enter Chapter Name:');
+      if(title){
+        const newChapter = {
+          chapterId : uniqid(),
+          chapterTitle:title,
+          chapterContent:[],
+          collapsed : false,
+          chapterOrder:chapter.length > 0 ? chapters.slice(-1)[0].chapterOrder + 1:1,
+        }
+        setChapters([...chapters,newChapter])
+      }
+    }else if(action === 'remove'){
+      setChapters(chapters.filter((chapter)=> chapter.chapterId !==chapterId));
+    }else if(action === 'toggle'){
+        setChapters(chapters.map((chapter)=> chapter.chapterId === chapterId ? {...chapter,collapsed:!chapter.collapsed}:chapter))
+    }
+  }
+
   useEffect(() => {
     if (!quillRef.current && editorRef.current) {
       quillRef.current = new Quill(editorRef.current, {
@@ -92,7 +112,9 @@ const AddCourse = () => {
                 )}
             </div>
           ))}
-          <div className='flex justify-center items-center bg-blue-100 p-2 rounded-lg cursor-pointer'>+ Add Chapter</div>
+
+          <div className='flex justify-center items-center bg-blue-100 p-2 rounded-lg cursor-pointer' onClick={()=> handleChapter('add')}>+ Add Chapter</div>
+
           {showPopUp && (
             <div className='fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50'>
               <div className='bg-white text-gray-700 p-4 rounded relative w-full max-w-80'>
@@ -136,7 +158,7 @@ const AddCourse = () => {
 
           }
         </div>
-    
+         <button type='submit' className='bg-black text-white w-max py-2.5 px-8 rounded my-4'>Add</button>
       </form>
     </div>
   )
