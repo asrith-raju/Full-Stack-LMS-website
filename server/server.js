@@ -13,6 +13,8 @@ const app = express()
 
 await connectDB()
 
+
+
 //Middlewares
 
 app.use(cors())
