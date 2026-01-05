@@ -102,7 +102,8 @@ export const AppContextProvider = (props)=>{
 
     //Fetch user Enrolled Courses
     const fetchUserEnrolledCourses = async ()=>{
-      const token = await getToken()
+      try {
+         const token = await getToken()
       const {data} = await axios.get(backendURL + "/api/user/enrolledCourses",{headers:{Authorization:`Bearer ${token}`}})
 
       if(data.success){
@@ -110,6 +111,10 @@ export const AppContextProvider = (props)=>{
       }else{
         toast.error(data.message)
       }
+      } catch (error) {
+         toast.error(error.message)
+      }
+      
     }
 
 
