@@ -105,6 +105,8 @@ export const stripeWebhooks = async (req,res)=>{
             await purchaseData.save()
             break
         }
-            
+          default:
+            console.log(`Unhandled event type${event.type}`);
+              
        }
 }
