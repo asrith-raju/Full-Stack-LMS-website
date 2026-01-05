@@ -2,6 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import { dummyCourses } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
 import humanizeDuration from "humanize-duration"
+import axios from "axios";
 import {useAuth,useUser} from "@clerk/clerk-react"
 
 
@@ -9,6 +10,7 @@ export const AppContext = createContext()
 
 export const AppContextProvider = (props)=>{
 
+    const backendURL = import.meta.env.VITE_BACKEND_URL
     const currency = import.meta.env.VITE_CURRENCY
 
     const navigate = useNavigate()
@@ -24,7 +26,12 @@ export const AppContextProvider = (props)=>{
 
      const fetchAllCourses = async()=>{
        try {
-         
+       const {data} =  await axios.get(backendURL + "/api/course/all")
+       if(data.success){
+         setAllCourses(data.courses)
+       }else{
+       
+       }
        } catch (error) {
          
        }
