@@ -6,6 +6,8 @@ import { useParams } from 'react-router-dom'
 import YouTube from  'react-youtube'
 import Footer from '../../components/student/Footer'
 import Rating from '../../components/student/Rating'
+import axios from 'axios'
+import { toast } from 'react-toastify'
 
 const Player = () => {
   const {enrolledCourses, calculateChapterTime,backendUrl,getToken,userData,fetchUserEnrolledCourses} = useContext(AppContext)
@@ -41,8 +43,26 @@ const Player = () => {
   } 
   
   useEffect(() => {
-   getCourseData()
+    if(enrolledCourses.length > 0){
+      getCourseData()
+    }
   }, [enrolledCourses])
+
+
+  const markLectureAsCompleted = async(lectureId)=>{
+    try {
+      const token = await getToken()
+      const {data}  = await axios.post(backendUrl+'/api/user/update-course-progress',{courseId,lectureId},{headers:{Authorization:`Bearer ${token}`}})
+
+      if(data.success){
+        toast.success(data.message)
+      }else{
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
   
   return (
     <>
