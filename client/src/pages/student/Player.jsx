@@ -1,4 +1,4 @@
-import React, { useContext, useState,useEffect } from 'react'
+import React, { useContext, useState,useEffect, use } from 'react'
 import { AppContext } from '../../context/AppContext'
 import { assets } from '../../assets/assets'
 import humanizeDuration from 'humanize-duration'
@@ -8,6 +8,7 @@ import Footer from '../../components/student/Footer'
 import Rating from '../../components/student/Rating'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import Loading from '../../components/student/Loading'
 
 const Player = () => {
   const {enrolledCourses, calculateChapterTime,backendUrl,getToken,userData,fetchUserEnrolledCourses} = useContext(AppContext)
@@ -78,8 +79,30 @@ const Player = () => {
       toast.error(error.message)
     }
   }
+
+  const handleRate=async(rating)=>{
+    try {
+      const token = await getToken()
+      const {data} = await axios.post(backendUrl+'/api/user/add-rating',{courseId,rating},{headers:{Authorization:`Bearer ${token}`}})
+      if(data.success){
+        toast.success(data.message)
+        fetchUserEnrolledCourses()
+      }else{
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
   
-  return (
+  useEffect(()=>{ 
+       getCourseProgress()
+  },[])
+
+
+
+
+  return courseData? (
     <>
     <div className='p-4 sm:p-10 flex flex-col-reverse md:grid md:grid-cols-2 gap-10 md:px-36'>
      {/* Left column */}
@@ -122,7 +145,7 @@ const Player = () => {
 
       <div className='flex items-center gap-2 py-3 mt-10'>
         <h1 className='text-xl font-bold'>Rate this Course :</h1>
-        <Rating initialRating={0}/>
+        <Rating initialRating={initialRating} onRate={handleRate}/>
       </div>
  
       </div>
@@ -136,7 +159,7 @@ const Player = () => {
               <p>
                 {playerData.chapter}.{playerData.lecture}.{playerData.lectureTitle}
               </p>
-              <button className='text-blue-600'>{false ? 'Completed' : 'Mark Complete'}</button>
+              <button onClick={()=>markLectureAsCompleted(playerData.lectureId)} className='text-blue-600'>{progressData && progressData.lectureCompleted.includes(playerData.lectureId) ? 'Completed' : 'Mark Complete'}</button>
             </div>
           </div>
         ) : <img src={courseData ? courseData.courseThumbnail : ''} alt="" />}
@@ -146,7 +169,7 @@ const Player = () => {
        </div>\
        <Footer/>
   </>
-  )
+  ):<Loading/>
 }
 
 export default Player
