@@ -4,6 +4,7 @@ import Quill from 'quill'
 import { assets } from '../../assets/assets'
 import { AppContext } from '../../context/AppContext'
 import { toast } from 'react-toastify'
+import axios from 'axios'
 
 const AddCourse = () => {
   const  {backendURL,getToken} = useContext(AppContext)
@@ -106,6 +107,12 @@ const handleSubmit = async(e)=>{
 
   if(data.success){
     toast.success(data.message)
+    setCourseTitle('')
+    setCoursePrice(0)
+    setDiscount(0)
+    setImage(null)
+    setChapters([])
+    quillRef.current.root.innerHTML=''
   }else{
     toast.error(data.message)
   }
