@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { AppContext } from '../../context/AppContext'
 import { useState } from 'react'
 import {Line} from 'rc-progress'
@@ -28,8 +28,20 @@ const MyEnrollments = () => {
       toast.error(error.message)
     }
   }
+
+  useEffect(()=>{
+    if(userData){
+       fetchUserEnrolledCourses()
+          }
+    },[userData])
+
+  useEffect(()=>{
+    if(enrolledCourses.length>0){
+      getcourseProgress()
+        }
+    },[getcourseProgress])
   return (
-    <>
+    <> 
     <div className='md:px-36 px-8 pt-10'>
       <h1 className='text-2xl font-semibold'>My Enrollments</h1>
       <table className='md:table-auto table-fixed w-full overflow-hidden border mt-10'>
