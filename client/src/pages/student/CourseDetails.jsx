@@ -22,12 +22,12 @@ const CourseDetails = () => {
 
   const [playerData, setPlayerData] = useState(null)
 
-  const { allCourses, calculateRating, calculateChapterTime, calculateNoOfLectures, CalculateCourseDuration, currency,backendUrl,userData,getToken} = useContext(AppContext)
+  const { allCourses, calculateRating, calculateChapterTime, calculateNoOfLectures, CalculateCourseDuration, currency,backendURL,userData,getToken} = useContext(AppContext)
 
 
   const fetchCourseData = async() => {
     try {
-      const {data} = await axios.get(backendUrl+'/api/course/'+id)
+      const {data} = await axios.get(backendURL+'/api/course/'+id)
       if(data.success){
         setCourseData(data.courseData)
       }else{
