@@ -1,8 +1,9 @@
-import Stripe from "stripe"
 import Course from "../models/Course.js"
 import Purchase from "../models/Purchase.js"
 import User from "../models/User.js"
 import { courseProgress } from "../models/courseProgress.js"
+import razorpayInstance from "../configs/razorpay.js";
+import crypto from "crypto";
 
 //Get User Data
 export const getUserData = async(req,res)=>{
@@ -32,57 +33,59 @@ export const userEnrolledCourses = async(req,res)=>{
 }
  
 //Purchase Course
-export const purchaseCourse = async(req,res)=>{
-   try {
-    const {courseId} = req.body
-    const {origin} = req.headers
-    const userId = req.auth().userId
-    const userData = await User.findById(userId)
-    const courseData = await Course.findById(courseId)
-    if(!userData || !courseData){
-        return res.json({success:false,message:'Data Not Found'})
+export const purchaseCourse = async (req, res) => {
+  try {
+    const { courseId } = req.body;
+    const userId = req.auth().userId;
 
+    const user = await User.findById(userId);
+    const course = await Course.findById(courseId);
+
+    if (!user || !course) {
+      return res.json({ success: false, message: "Data not found" });
     }
-    const purchaseData = {
-        courseId:courseData._id,
-        userId,
-        amount:(courseData.coursePrice - courseData.discount * courseData.coursePrice/100).toFixed(2),
-    
+
+    // Prevent duplicate pending payment
+    const existing = await Purchase.findOne({
+      userId,
+      courseId,
+      status: "pending",
+    });
+    if (existing) {
+      return res.json({ success: false, message: "Payment already in progress" });
     }
-    const newPurchase = await Purchase.create(purchaseData)
-    //Stripe Gateway Initialize
 
-    const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY) 
-    const currency = process.env.CURRENCY.toLowerCase()
+    const finalAmount = Math.round(
+      (course.coursePrice -
+        (course.discount * course.coursePrice) / 100) * 100
+    ); // in paise
 
-    //Creating line items for Stripe
+    const purchase = await Purchase.create({
+      courseId,
+      userId,
+      amount: finalAmount / 100,
+    });
 
-    const  line_items=[{
-        price_data:{
-            currency,
-            product_data:{
-                name:courseData.courseTitle,
-            },
-            unit_amount:Math.floor(newPurchase.amount*100)
-        },
-        quantity:1,
-    }]
-     const session = await stripeInstance.checkout.sessions.create({
-        success_url:`${origin}/loading/my-enrollments`,
-        cancel_url:`${origin}/`,
-        line_items:line_items,
-        mode:'payment',
-        metadata:{
-            purchaseId:newPurchase._id.toString()
-        }
-     })
-        
-   res.json({success:true,session_url:session.url})
-   } catch (error) {
-    res.json({success:false,message:error.message})
-   
-   }
-}
+    const order = await razorpayInstance.orders.create({
+      amount: finalAmount,
+      currency: process.env.CURRENCY,
+      receipt: purchase._id.toString(),
+    });
+
+    res.json({
+      success: true,
+      order,
+      razorpayKey: process.env.RAZORPAY_KEY_ID,
+      purchaseId: purchase._id,
+      user: {
+        name: user.name,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
 
 //update User Course Progress
 
@@ -152,3 +155,49 @@ export const purchaseCourse = async(req,res)=>{
             res.json({success:false,message:error.message})
         }
     }
+
+export const verifyRazorpayPayment = async (req, res) => {
+  try {
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      purchaseId,
+    } = req.body;
+
+    const generatedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(razorpay_order_id + "|" + razorpay_payment_id)
+      .digest("hex");
+
+    if (generatedSignature !== razorpay_signature) {
+      return res.json({ success: false, message: "Payment verification failed" });
+    }
+
+    const purchase = await Purchase.findById(purchaseId);
+    if (!purchase) {
+      return res.json({ success: false });
+    }
+
+    const user = await User.findById(purchase.userId);
+    const course = await Course.findById(purchase.courseId);
+
+    // Enroll user
+    if (!course.enrolledStudents.includes(user._id)) {
+      course.enrolledStudents.push(user._id);
+      await course.save();
+    }
+
+    if (!user.enrolledCourses.includes(course._id)) {
+      user.enrolledCourses.push(course._id);
+      await user.save();
+    }
+
+    purchase.status = "completed";
+    await purchase.save();
+
+    res.json({ success: true });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
