@@ -22,7 +22,7 @@ const CourseDetails = () => {
 
   const [playerData, setPlayerData] = useState(null)
 
-  const { allCourses, calculateRating, calculateChapterTime, calculateNoOfLectures, CalculateCourseDuration, currency,backendURL,userData,getToken} = useContext(AppContext)
+  const { allCourses, calculateRating, calculateChapterTime, calculateNoOfLectures, CalculateCourseDuration, currency,backendURL,userData,getToken, navigate} = useContext(AppContext)
 
 
   const fetchCourseData = async() => {
@@ -38,27 +38,57 @@ const CourseDetails = () => {
     }
   }
 
-  const enrollCourse = async()=>{
-    try {
-      if(!userData){
-        return toast.warn('Login to Enroll')
-      }
-      if(isAlreadyEnrolled){
-        return toast.warn('Already Enrolled')
-      }
-      const token = await getToken()
+const enrollCourse = async () => {
+  try {
+    if (!userData) return toast.warn("Login to enroll");
 
-      const {data} = await axios.post(backendUrl+'/api/user/purchase',{courseId:courseData._id},{headers:{Authorization:`Bearer ${token}`}})
-      if(data.success){
-        const {session_url} = data
-        window.location.replace(session_url)
-      }else{
-        toast.error(data.message)
-      }
-    } catch (error) {
-      toast.error(error.message)
+    const token = await getToken();
+
+    const { data } = await axios.post(
+      backendURL + "/api/user/purchase",
+      { courseId: courseData._id },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (!data.success) {
+      return toast.error(data.message);
     }
+
+    const options = {
+      key: data.razorpayKey,
+      amount: data.order.amount,
+      currency: "INR",
+      name: "Edemy LMS",
+      description: courseData.courseTitle,
+      order_id: data.order.id,
+      handler: async function (response) {
+        await axios.post(
+          backendURL + "/api/user/verify-payment",
+          {
+            ...response,
+            purchaseId: data.purchaseId,
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        toast.success("Enrollment successful");
+        navigate("/my-enrollments");
+      },
+      prefill: {
+        name: data.user.name,
+        email: data.user.email,
+      },
+      theme: {
+        color: "#3399cc",
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  } catch (error) {
+    toast.error(error.message);
   }
+};
 
 
   useEffect(() => {
