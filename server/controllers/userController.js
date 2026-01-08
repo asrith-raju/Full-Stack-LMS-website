@@ -196,7 +196,7 @@ export const verifyRazorpayPayment = async (req, res) => {
     purchase.status = "completed";
     await purchase.save();
 
-    res.json({ success: true });
+    res.json({ success: true, enrolledCourseId: course._id});
   } catch (error) {
     res.json({ success: false, message: error.message });
   }

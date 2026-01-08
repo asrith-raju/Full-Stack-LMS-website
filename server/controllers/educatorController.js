@@ -108,7 +108,6 @@ export const educatorDashboardData = async (req, res) => {
                 enrolledStudentsData
             }, message: 'Dashboard Data Fetched Successfully'
         })
-
     }
     catch (error) {
 
